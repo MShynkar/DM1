@@ -45,9 +45,9 @@ def getUWithBoundaries(lower: int, higher: int) -> set:
         messagebox.showerror("Помилка", message="Верхня межа менша за нижню")
         return set()
 
-def saveA(A: set, entryA: tk.Entry ):
-    A_str = list(entryA.get().split())
-    A = set(int(element) for element in A_str)
+def extractSetFromEntry(entry: tk.Entry ) -> set:
+    A_str = list(entry.get().split())
+    return set(int(element) for element in A_str)
 
 
 def saveB(B: set, entryB: tk.Entry):

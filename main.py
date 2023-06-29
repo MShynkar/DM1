@@ -1,8 +1,10 @@
-from Window1 import Window1
+from Window1 import Window1, Problem
 
 
 def main():
-    Window1()
+    p = Problem()
+    Window1(p)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

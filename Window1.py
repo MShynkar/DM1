@@ -3,39 +3,44 @@ from tkinter import messagebox
 import random as rn
 from funcs import *
 
-A = set()
-B = set()
-C = set()
-U = set(i for i in range(256))  # універсальна множина
+
+class Problem:
+    A: set = set()
+    B: set = set()
+    C: set = set()
+    U: set = set(i for i in range(256))
 
 
-def Window1(A, B, C, U):
-    
+def Window1(p: Problem):
     G = 22  # номер групи
     N = 31  # номер у групі
 
     Window1 = tk.Tk()
     Window1.title("Головне меню")
     Window1.geometry(f"800x600")
-    name = tk.Label(Window1, text=f"ПІБ: Шинкар Максим \n"
-                                f"Олександрович\n "
-                                f"Група: ІО-{G}\n "
-                                f"Мій варіант: {(N + G % 60) % 30 + 1}",
-                    font=("Times New Roman", 14))
+    name = tk.Label(
+        Window1,
+        text=f"ПІБ: Шинкар Максим \n"
+        f"Олександрович\n "
+        f"Група: ІО-{G}\n "
+        f"Мій варіант: {(N + G % 60) % 30 + 1}",
+        font=("Times New Roman", 14),
+    )
     name.grid(row=0, column=0)
 
     def onWindow2():
-        window2(A,B,C,U)
+        window2(p)
+
     def onWindow3():
-        window3(A,B,C,U)
+        window3(A, B, C, U)
+
     def onWindow4():
-        window4(A,B,C,U)
+        window4(A, B, C, U)
+
     def onWindow5():
-        window5(A,B,C,U)   
-    
+        window5(A, B, C, U)
 
-
-    window2Call = tk.Button(Window1, text="Виклик вікна №2", command=onWindow2)   
+    window2Call = tk.Button(Window1, text="Виклик вікна №2", command=onWindow2)
     window2Call.grid(row=0, column=1)
     window3Call = tk.Button(Window1, text="Виклик вікна №3", command=onWindow3)
     window3Call.grid(row=0, column=2)
@@ -43,8 +48,6 @@ def Window1(A, B, C, U):
     window4Call.grid(row=0, column=3)
     window5Call = tk.Button(Window1, text="Виклик вікна №5", command=onWindow5)
     window5Call.grid(row=0, column=4)
-
-
 
     valueA = tk.Entry(Window1)
     valueA.grid(row=3, column=2)
@@ -57,26 +60,22 @@ def Window1(A, B, C, U):
     create_label(Window1, "Введіть потужність B:", row=2, column=3)
     create_label(Window1, "Введіть потужність C:", row=2, column=4)
 
-
     def onGenerateA():
-        generateA(A, valueA)
+        generateA(p.A, valueA)
 
     def onGenerateB():
-        generateB(B, valueB)
-    
-    def onGenerateC():
-        generateC(C, valueC)
+        generateB(p.B, valueB)
 
-    generateA_btn = tk.Button(Window1, text="Згенерувати A",
-                            command=onGenerateA)
+    def onGenerateC():
+        generateC(p.C, valueC)
+
+    generateA_btn = tk.Button(Window1, text="Згенерувати A", command=onGenerateA)
     generateA_btn.grid(row=4, column=2)
 
-    generateB_btn = tk.Button(Window1, text="Згенерувати B",
-                            command=onGenerateB)
+    generateB_btn = tk.Button(Window1, text="Згенерувати B", command=onGenerateB)
     generateB_btn.grid(row=4, column=3)
 
-    generateC_btn = tk.Button(Window1, text="Згенерувати C",
-                            command=onGenerateC)
+    generateC_btn = tk.Button(Window1, text="Згенерувати C", command=onGenerateC)
     generateC_btn.grid(row=4, column=4)
 
     entryA = tk.Entry(Window1)
@@ -87,14 +86,13 @@ def Window1(A, B, C, U):
     entryC.grid(row=5, column=4)
 
     def onSaveA():
-        saveA(A, entryA)
-    
+        p.A = extractSetFromEntry(entryA)
+
     def onSaveB():
         saveB(B, entryB)
 
     def onSaveC():
         saveC(C, entryC)
-
 
     saveA_btn = tk.Button(Window1, text="Зберегти A", command=onSaveA)
     saveA_btn.grid(row=6, column=2)
@@ -116,40 +114,43 @@ def Window1(A, B, C, U):
     # place(x=500, y=250)
 
     def OnSetU():
-        higher_boundary = int(entry_higher_boundary.get()) if (entry_higher_boundary.get() != '') else 255
-        lower_boundary = int(entry_lower_boundary.get()) if (entry_lower_boundary.get() != '') else 0
+        higher_boundary = (
+            int(entry_higher_boundary.get())
+            if (entry_higher_boundary.get() != "")
+            else 255
+        )
+        lower_boundary = (
+            int(entry_lower_boundary.get()) if (entry_lower_boundary.get() != "") else 0
+        )
         U = getUWithBoundaries(lower_boundary, higher_boundary)
-
 
     saveU = tk.Button(Window1, text="Встановити границі", command=OnSetU)
     saveU.grid(row=9, column=2)
 
-
     Window1.mainloop()
 
 
-
-def window2(A, B, C, U):
+def window2(p: Problem):
     Window2 = tk.Tk()
     Window2.geometry(f"300x300")
     Window2.title("Вікно2")
-    Label1 = tk.Label(Window2, text="A="+str(A)) 
-    Label1.pack()  #grid(column=1,row=1)
-    Label2 = tk.Label(Window2, text="B="+str(B))
-    Label2.pack() #grid(column=1,row=2)
-    Label3 = tk.Label(Window2, text="C="+str(C))
-    Label3.pack() #grid(column=1,row=3)
-    Label4 = tk.Label(Window2,text= "D = A̅ ∪ B ∪ C̅ ∪ (B ∩ C̅) ∪ (A̅ ∩ C) ∪ (A ∩ B)")
-    Label4.pack() #grid(column=1,row=4)
+    Label1 = tk.Label(Window2, text="A=" + str(p.A))
+    Label1.pack()  # grid(column=1,row=1)
+    Label2 = tk.Label(Window2, text="B=" + str(p.B))
+    Label2.pack()  # grid(column=1,row=2)
+    Label3 = tk.Label(Window2, text="C=" + str(p.C))
+    Label3.pack()  # grid(column=1,row=3)
+    Label4 = tk.Label(Window2, text="D = A̅ ∪ B ∪ C̅ ∪ (B ∩ C̅) ∪ (A̅ ∩ C) ∪ (A ∩ B)")
+    Label4.pack()  # grid(column=1,row=4)
 
     def onStep():
-        step(Window2,A, B, C, U)
+        step(Window2, p.A, p.B, p.C, p.U)
 
     StepButton = tk.Button(Window2, text="Крок", command=onStep)
     StepButton.pack(side=tk.TOP)
 
+    D = stepResult(p.A, p.B, p.C, p.U)
 
-    D = stepResult(A, B, C, U)
     def onSave():
         saveD(D, "D.txt")
 
@@ -157,28 +158,29 @@ def window2(A, B, C, U):
     SaveButton.pack(side=tk.BOTTOM)
 
     Window2.mainloop()
-    
+
+
 def window3(A, B, C, U):
     Window3 = tk.Tk()
     Window3.geometry(f"300x300")
     Window3.title("Вікно3")
-    Label1 = tk.Label(Window3, text="A="+str(A))
-    Label1.pack()  #grid(column=1,row=1)
-    Label2 = tk.Label(Window3, text="B="+str(B))
-    Label2.pack() #grid(column=1,row=2)
-    Label3 = tk.Label(Window3, text="C="+str(C))
-    Label3.pack() #grid(column=1,row=3)
-    Label4 = tk.Label(Window3,text= "D = A̅ ∪ B ∪ C̅ ")
-    Label4.pack() #grid(column=1,row=4)
+    Label1 = tk.Label(Window3, text="A=" + str(A))
+    Label1.pack()  # grid(column=1,row=1)
+    Label2 = tk.Label(Window3, text="B=" + str(B))
+    Label2.pack()  # grid(column=1,row=2)
+    Label3 = tk.Label(Window3, text="C=" + str(C))
+    Label3.pack()  # grid(column=1,row=3)
+    Label4 = tk.Label(Window3, text="D = A̅ ∪ B ∪ C̅ ")
+    Label4.pack()  # grid(column=1,row=4)
 
     def onStep():
-        step(Window3,A, B, C, U)
+        step(Window3, A, B, C, U)
 
     StepButton = tk.Button(Window3, text="Крок", command=onStep)
     StepButton.pack(side=tk.TOP)
 
-
     D = stepResult(A, B, C, U)
+
     def onSave():
         saveD(D, "D2.txt")
 
@@ -210,7 +212,7 @@ def window4(A, B, C, U):
     Label3.pack()
 
     Window4.mainloop()
+
+
 def window5():
     pass
-
-Window1(A,B,C,U)
