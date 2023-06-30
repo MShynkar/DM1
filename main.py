@@ -1,9 +1,9 @@
-from Window1 import Window1, Problem
+from Window import Window1, Solution
 
 
 def main():
-    p = Problem()
-    Window1(p)
+    s = Solution()
+    Window1(s)
 
 
 if __name__ == "__main__":

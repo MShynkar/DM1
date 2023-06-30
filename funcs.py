@@ -12,41 +12,16 @@ def create_label(window, message, row=None, column=None):
     label.grid(row=row, column=column)
 
 
-def generateSet(value: tk.Entry, max_value: int) -> set:
+def generateSet(value: tk.Entry, max_value: int, min_value: int) -> set:
     result = set()
     try:
-        for _ in range(int(value.get())):
-            result.add(rn.randint(0, max_value))
+        count = int(value.get())
+        while len(result) < count:
+            result.add(rn.randint(min_value, max_value))
     except ValueError:
         messagebox.showerror("Помилка", message="Не задана потужність множини!")
     return result
 
-
-def generateA(A: set, valueA: tk.Entry):
-    try:
-        A.clear()
-        for _ in range(int(valueA.get())):
-            A.add(rn.randint(0, 256))
-    except ValueError:
-        messagebox.showerror("Помилка", message="Не задана потужність множини А!")
-
-
-def generateB(B: set, valueB: tk.Entry):
-    try:
-        B.clear()
-        for _ in range(int(valueB.get())):
-            B.add(rn.randint(0, 256))
-    except ValueError:
-        messagebox.showerror("Помилка", message="Не задана потужність множини B!")
-
-
-def generateC(C: set, valueC: tk.Entry):
-    try:
-        C.clear()
-        for i in range(int(valueC.get())):
-            C.add(rn.randint(0, 256))
-    except ValueError:
-        messagebox.showerror("Помилка", message="Не задана потужність множини C!")
 
 
 def getUWithBoundaries(lower: int, higher: int) -> set:
@@ -60,6 +35,7 @@ def getUWithBoundaries(lower: int, higher: int) -> set:
 def extractSetFromEntry(entry: tk.Entry) -> set:
     A_str = list(entry.get().split())
     return set(int(element) for element in A_str)
+    
 
 
 def step(window: tk.Tk, inA: set, inB: set, inC: set, inU: set):
@@ -125,7 +101,7 @@ def stepResult(inA: set, inB: set, inC: set, inU: set):
     return temporary_result
 
 
-def saveD(D: set, file):
+def save(D: set, file: str):
     with open(file, "w+") as f:
         f.write(str(D))
 
@@ -133,29 +109,47 @@ def saveD(D: set, file):
 def step2(window: tk.Tk, inA: set, inB: set, inC: set, inU: set):
     nott = lambda A: inU - A
 
-    result = nott(inA).union(inB.union(nott(inC)))
-    temporary_result = nott(inA).union(inB)
-    Label5 = tk.Label(window, text=f"A̅ ∪ B = {temporary_result}")
-    Label5.pack()
+    if not hasattr(window, "step_counter"):
+        window.step_counter = 1
+    else:
+        window.step_counter += 1
 
-    temporary_result = nott(inC).union(temporary_result)
-    Label6 = tk.Label(window, text=f"A̅ ∪ B ∪ C̅ = {temporary_result}")
-    Label6.pack()
+    if window.step_counter == 1:
+        temporary_result = nott(inA).union(inB)
+        Label5 = tk.Label(window, text=f"A̅ ∪ B = {temporary_result}")
+        Label5.pack()
+    elif window.step_counter == 2:
+        temporary_result = nott(inA).union(inB).union(nott(inC))
+        Label6 = tk.Label(window, text=f"A̅ ∪ B ∪ C̅ = {temporary_result}")
+        Label6.pack()
 
-
-def symmetric_difference(A, B, inU):
+def step2Result(inA: set, inB: set, inC: set, inU: set):
     nott = lambda A: inU - A
-    X = nott(A)
-    Y = nott(B)
+    result = (nott(inA).union(inB)).union(nott(inC))
+    return result
 
+def symmetricDifference(inX: set, inY:set):
     result = set()
 
-    for element in X:
-        if element not in Y:
+    for element in inX:
+        if element not in inY:
             result.add(element)
 
-    for element in Y:
-        if element not in X:
+    for element in inY:
+        if element not in inX:
             result.add(element)
 
     return result
+
+def read(file):
+    with open(file, "r+") as f:
+        content = f.read()
+        
+    return content
+
+def compare(file1: str,file2:str ):
+    content1 = read(file1)
+    content2 = read(file2)
+    if content1 == content2:
+        return True
+    return False
